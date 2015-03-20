@@ -18,9 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package Quote provides a generic interface around retrieving stock quotes
-
-// The quote package must be used in conjuncition with a quote driver
+// Package quote provides a generic interface around retrieving stock quotes
+// The quote package must be used in conjunction with one or more quote drivers
 package quote
 
 import (
@@ -59,15 +58,18 @@ func Drivers() []string {
 	return list
 }
 
-// QuoteSource is used as the handle used to access the quote source
+// Source is used as the handle used to access the quote source
 // to retrieve quotes
-type QuoteSource struct {
+type Source struct {
 	driver     driver.Driver
 	handle     driver.Handle
 	sourceName string
 }
 
-func Open(driverName, sourceName string) (*QuoteSource, error) {
+// Open opens a quote source specified by its driver name and a
+// driver-specific data source name (if required by the driver)
+// Returns a Source that can be used to retrieve quotes
+func Open(driverName, sourceName string) (*Source, error) {
 	driveri, ok := drivers[driverName]
 
 	if !ok {
@@ -80,7 +82,7 @@ func Open(driverName, sourceName string) (*QuoteSource, error) {
 		return nil, err
 	}
 
-	qs := &QuoteSource{
+	qs := &Source{
 		driver:     driveri,
 		sourceName: sourceName,
 		handle:     handle,
@@ -89,7 +91,9 @@ func Open(driverName, sourceName string) (*QuoteSource, error) {
 	return qs, nil
 }
 
-func Retrieve(qs *QuoteSource, tickers []string) (q []driver.StockQuote, err error) {
+// Retrieve takes Source handle as returned by Open and accepts a list of stock tickers
+// It returns a list of StockQuotes or an error if something went wrong
+func Retrieve(qs *Source, tickers []string) (q []driver.StockQuote, err error) {
 	q, err = qs.handle.Retrieve(tickers)
 	return
 }

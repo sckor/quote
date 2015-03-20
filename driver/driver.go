@@ -20,13 +20,11 @@
 
 // Package driver defines the interfaces that must be implemented to retrieve
 // a stock quote as used by package quote
-
 package driver
 
-import (
-	"errors"
-)
-
+// StockQuote - The result of a stock quote query.
+// The symbol is a string and represents the stock ticker
+// The LastTradePrice is the price of the stock
 type StockQuote struct {
 	Symbol         string
 	LastTradePrice float64
@@ -36,8 +34,6 @@ type StockQuote struct {
 type Driver interface {
 	Open(name string) (Handle, error)
 }
-
-var ErrBadConn = errors.New("driver: bad connection")
 
 // Handle provides the access to the quote service
 type Handle interface {
